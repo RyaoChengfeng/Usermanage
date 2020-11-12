@@ -5,14 +5,12 @@ import (
 )
 
 type UserInfo struct {
-	Uid        int    `json:"uid,omitempty"`
+	Uid        int    `json:"uid,omitempty"` //omitempty用于忽略空字段（这里没有空字段）
 	UserName   string `json:"username"`
 	Passwd     string `json:"passwd"`
 	Permission string `json:"permission"`
 	Email      string `json:"email"`
 }
-
-// 看一下有没有必要在model里处理err
 
 func InsertUser(userinfo UserInfo) error {
 	_, err := db.Exec("INSERT INTO users(username,passwd,email,permission) values (?,?,?,?)", userinfo.UserName, userinfo.Passwd, userinfo.Email, userinfo.Permission)
@@ -33,11 +31,16 @@ func CheckUsername(userinfo UserInfo) (bool, error) {
 	return result, err
 }
 
-// 待debug：用username搜passwd，再进行匹配
 func CheckPassword(userinfo UserInfo) (string, error) {
 	var passwd string
 	err := db.Select(&passwd, "SELECT passwd FROM users WHERE username=?", userinfo.UserName)
 	return passwd, err
+}
+
+func CheckActivateStatus(userinfo UserInfo) (int, error) {
+	var activated int
+	err := db.Select(&activated, "SELECT activated FROM users WHERE username=?", userinfo.UserName)
+	return activated, err
 }
 
 func DeleteUser(userinfo UserInfo) (string, error) {
@@ -81,6 +84,7 @@ func UpdateUserinfo(origUsername string, userinfo UserInfo) (string, error) {
 			fmt.Println("exec failed, ", err)
 			return "update failed", err
 		}
+
 	}
 
 	if userinfo.Email != "" {
@@ -91,9 +95,8 @@ func UpdateUserinfo(origUsername string, userinfo UserInfo) (string, error) {
 		}
 	}
 
-	//token中的信息也要改。。。
-	if userinfo.Permission=="default" || userinfo.Permission=="admin" {
-		_, err := db.Exec("UPDATE users SET permission=? WHERE username=?", userinfo.Permission,origUsername)
+	if userinfo.Permission == "default" || userinfo.Permission == "admin" {
+		_, err := db.Exec("UPDATE users SET permission=? WHERE username=?", userinfo.Permission, origUsername)
 		if err != nil {
 			fmt.Println("exec failed, ", err)
 			return "update failed", err
@@ -109,7 +112,7 @@ func FindUser(userinfo UserInfo) (UserInfo, error) {
 	if err != nil {
 		return info, err
 	}
-	return info, err
+	return info, nil
 }
 
 func ListUsers() ([]string, error) {
@@ -118,7 +121,13 @@ func ListUsers() ([]string, error) {
 	if err != nil {
 		return users, err
 	}
-	return users, err
+	return users, nil
 }
 
-
+func ActivateUser(userinfo UserInfo) (string, error) {
+	_, err := db.Exec("UPDATE users SET activated=? WHERE username=?", 1, userinfo.UserName)
+	if err != nil {
+		return "",err
+	}
+	return "you account is activate successfully", nil
+}
