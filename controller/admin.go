@@ -10,7 +10,7 @@ import (
 )
 
 func AdminDeleteUser(c echo.Context) error {
-	username := c.Param("user")
+	username := c.QueryParam("user")
 	userinfo := model.UserInfo{UserName: username}
 	msg, err := model.DeleteUser(userinfo)
 	if err != nil {
@@ -20,7 +20,7 @@ func AdminDeleteUser(c echo.Context) error {
 }
 
 func AdminFindUserinfo(c echo.Context) error {
-	username := c.Param("user")
+	username := c.QueryParam("user")
 	userinfo := model.UserInfo{UserName: username}
 	info, err := model.FindUser(userinfo)
 	if err != nil {
@@ -41,7 +41,7 @@ func AdminListAllUsers(c echo.Context) error {
 //我的构想是进入/user/:user后填入表单来修改
 //还有admin是应该可以改用户的所有东西？包括密码？
 func AdminUpdateUserinfo(c echo.Context) error {
-	origUsername := c.Param("user")
+	origUsername := c.QueryParam("user")
 	origUserinfo := model.UserInfo{UserName: origUsername}
 	userexit, err := model.CheckUsername(origUserinfo)
 	if err != nil {

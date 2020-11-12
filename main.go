@@ -1,8 +1,8 @@
 package main
 
 import (
+	"Usermanage/config"
 	"Usermanage/controller"
-	"Usermanage/model"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -16,20 +16,19 @@ func main() {
 	e.POST("/register", controller.UserRegister)
 	e.POST("/login", controller.UserLogin)
 
+	u:=e.Group("/user")
+	u.Use(middleware.JWTWithConfig(config.UserJWTConfig))
+
+	u.PUT("/:user",controller.UserUpdateUserinfo)
+
 	//注册一个中间件，在每次使用时都查询是否为管理员，用jwt查询
-	u := e.Group("/user")
+	a := e.Group("/user")
+	a.Use(middleware.JWTWithConfig(config.AdminJWTConfig)) //怎么直接确认admin？
 
-	config := middleware.JWTConfig{
-		Claims:     &model.JwtCustomClaims{},
-		SigningKey: []byte("secret"),
-	}
-	u.Use(middleware.JWTWithConfig(config))
-
-	u.GET("/:user", controller.AdminFindUserinfo)
-	u.DELETE("/:user", controller.AdminDeleteUser)
-	u.GET("/", controller.AdminListAllUsers)
-	u.POST("/:user",controller.AdminUpdateUserinfo)
-
+	a.GET("/:user", controller.AdminFindUserinfo)
+	a.DELETE("/:user", controller.AdminDeleteUser)
+	a.GET("/", controller.AdminListAllUsers)
+	a.PUT("/:user", controller.AdminUpdateUserinfo)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }

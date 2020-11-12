@@ -34,14 +34,10 @@ func CheckUsername(userinfo UserInfo) (bool, error) {
 }
 
 // 待debug：用username搜passwd，再进行匹配
-func CheckPassword(userinfo UserInfo) (bool, error) {
+func CheckPassword(userinfo UserInfo) (string, error) {
 	var passwd string
-	err := db.Select(&passwd, "SELECT passwd FROM users WHERE passwd=?", userinfo.Passwd)
-	result := false
-	if passwd != "" {
-		result = true
-	}
-	return result, err
+	err := db.Select(&passwd, "SELECT passwd FROM users WHERE username=?", userinfo.UserName)
+	return passwd, err
 }
 
 func DeleteUser(userinfo UserInfo) (string, error) {
@@ -125,4 +121,4 @@ func ListUsers() ([]string, error) {
 	return users, err
 }
 
-// 关闭数据库
+

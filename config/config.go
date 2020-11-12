@@ -1,10 +1,22 @@
 package config
 
-import "time"
+import (
+	"Usermanage/model"
+	"github.com/labstack/echo/middleware"
+	"time"
+)
 
-const (
- 	JWTSecret = "secret"
- 	JWTDuration = time.Hour * 12
-	//Md5hashSecret = []byte("hash")为什么错了？
- 	Md5hashSecret = "hash"
+var (
+	JWTSecret   = "secret"
+	JWTDuration = time.Hour * 12
+	//Md5hashSecret = []byte("hash")
+	Md5hashSecret  = "hash"
+	AdminJWTConfig = middleware.JWTConfig{
+		SigningKey: JWTSecret,
+		Claims:     model.JwtCustomClaims{Permission: "admin"},
+	}
+	UserJWTConfig = middleware.JWTConfig{
+		SigningKey: JWTSecret,
+		Claims:     model.JwtCustomClaims{Permission: "default"},
+	}
 )
