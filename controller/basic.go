@@ -6,14 +6,16 @@ import (
 	"Usermanage/util"
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
 )
 
 // /register
 func UserRegister(c echo.Context) error {
+	var userinfo model.UserInfo
 	username := c.FormValue("username")
-	userinfo := model.UserInfo{UserName: username}
+	userinfo.UserName = username
 	userexit, err := model.CheckUsername(userinfo)
 	if err != nil {
 		return ErrorHandler(c, http.StatusBadRequest, "")
@@ -35,7 +37,9 @@ func UserRegister(c echo.Context) error {
 		return ErrorHandler(c, http.StatusBadRequest, "email is required!")
 	}
 
-	userinfo = model.UserInfo{Passwd: encryptedPasswd, Email: email, Permission: "default"}
+	userinfo.Passwd = encryptedPasswd
+	userinfo.Email = email
+	userinfo.Permission = "default"
 	err = model.InsertUser(userinfo)
 	if err != nil {
 		return ErrorHandler(c, http.StatusBadRequest, err.Error())
@@ -64,8 +68,9 @@ func UserRegister(c echo.Context) error {
 
 // /login
 func UserLogin(c echo.Context) error {
+	var userinfo model.UserInfo
 	username := c.FormValue("username")
-	userinfo := model.UserInfo{UserName: username}
+	userinfo.UserName = username
 	userexit, err := model.CheckUsername(userinfo)
 	if err != nil {
 		return ErrorHandler(c, http.StatusBadRequest, err.Error())
@@ -82,7 +87,7 @@ func UserLogin(c echo.Context) error {
 	h.Write([]byte(passwd))
 	encryptedPasswd := hex.EncodeToString(h.Sum([]byte(config.Md5hashSecret)))
 
-	userinfo = model.UserInfo{Passwd: encryptedPasswd}
+	userinfo.Passwd = encryptedPasswd
 	userPasswd, err := model.CheckPassword(userinfo)
 	if err != nil {
 		return ErrorHandler(c, http.StatusBadRequest, err.Error())
@@ -93,6 +98,7 @@ func UserLogin(c echo.Context) error {
 
 	activateStatus, err := model.CheckActivateStatus(userinfo)
 	if err != nil {
+		fmt.Println(err)
 		return ErrorHandler(c, http.StatusBadRequest, err.Error())
 	}
 	if activateStatus == 0 {
@@ -103,11 +109,13 @@ func UserLogin(c echo.Context) error {
 
 	token, err := util.CreateAuthToken(userinfo)
 	if err != nil {
+		fmt.Println(err)
 		return ErrorHandler(c, http.StatusBadRequest, err.Error())
 	}
 
 	err = model.AddValidToken(token)
 	if err != nil {
+		fmt.Println(err)
 		return ErrorHandler(c, http.StatusBadRequest, err.Error())
 	}
 
@@ -128,14 +136,17 @@ func UserActivate(c echo.Context) error {
 
 	claims, err := util.ParseToken(tokenString)
 	if err != nil {
+		fmt.Println(err)
 		return ErrorHandler(c, http.StatusBadRequest, err.Error())
 	}
 
+	var userinfo model.UserInfo
 	username := claims.Username
-	userinfo := model.UserInfo{UserName: username}
+	userinfo.UserName = username
 
 	msg, err := model.ActivateUser(userinfo)
 	if err != nil {
+		fmt.Println(err)
 		return ErrorHandler(c, http.StatusBadRequest, err.Error())
 	}
 
@@ -148,6 +159,7 @@ func Logout(c echo.Context) error {
 	tokenString := util.GetJWTToken(authHeader)
 	err := model.AddInvalidToken(tokenString)
 	if err != nil {
+		fmt.Println(err)
 		return ErrorHandler(c, http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, "logout successfully")

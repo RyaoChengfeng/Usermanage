@@ -4,6 +4,7 @@ import (
 	"Usermanage/config"
 	"Usermanage/model"
 	"errors"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"strings"
 	"time"
@@ -43,9 +44,10 @@ func GetJWTToken(authHeader string) string {
 
 func ParseToken(tokenString string) (*config.JwtCustomClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &config.JwtCustomClaims{}, func(token *jwt.Token) (i interface{}, err error) {
-		return config.JWTSecret, nil
+		return []byte(config.JWTSecret), nil
 	})
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 	claims, ok := token.Claims.(*config.JwtCustomClaims)

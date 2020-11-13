@@ -23,7 +23,7 @@ func main() {
 
 	u.PUT("/:user", controller.UserUpdateUserinfo)
 
-	a := e.Group("/user")
+	a := e.Group("/admin")
 	a.Use(middleware.JWTWithConfig(config.AdminJWTConfig))
 
 	a.GET("/:user", controller.AdminFindUserinfo)

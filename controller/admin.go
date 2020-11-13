@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-// /user/:user?user=
+// /admin/:user?user=
 func AdminDeleteUser(c echo.Context) error {
 	username := c.QueryParam("user")
 	userinfo := model.UserInfo{UserName: username}
@@ -20,7 +20,7 @@ func AdminDeleteUser(c echo.Context) error {
 	return c.JSON(http.StatusOK, msg)
 }
 
-// /user/:user?user=
+// /admin/:user?user=
 func AdminFindUserinfo(c echo.Context) error {
 	username := c.QueryParam("user")
 	userinfo := model.UserInfo{UserName: username}
@@ -31,7 +31,7 @@ func AdminFindUserinfo(c echo.Context) error {
 	return c.JSON(http.StatusOK, info)
 }
 
-// /user/users
+// /admin/users
 func AdminListAllUsers(c echo.Context) error {
 	users, err := model.ListUsers()
 	if err != nil {
@@ -40,7 +40,7 @@ func AdminListAllUsers(c echo.Context) error {
 	return c.JSON(http.StatusOK, users)
 }
 
-// /user/:user?user=
+// /admin/:user?user=
 func AdminUpdateUserinfo(c echo.Context) error {
 	origUsername := c.QueryParam("user")
 	origUserinfo := model.UserInfo{UserName: origUsername}
@@ -75,7 +75,6 @@ func AdminUpdateUserinfo(c echo.Context) error {
 	return c.JSON(http.StatusOK, msg)
 }
 
-
-//提问，admin用什么来操作用户？
-//我的构想是进入/user/:user后填入表单来修改
+//admin用什么来操作用户？
+//我的构想是进入/admin/:user后填入表单来修改
 //还有admin是应该可以改用户的所有东西？包括密码？

@@ -13,6 +13,8 @@ type UserInfo struct {
 }
 
 func InsertUser(userinfo UserInfo) error {
+	fmt.Println("start InsertUser")
+	fmt.Println(userinfo)
 	_, err := db.Exec("INSERT INTO users(username,passwd,email,permission) values (?,?,?,?)", userinfo.UserName, userinfo.Passwd, userinfo.Email, userinfo.Permission)
 	if err != nil {
 		return err
@@ -22,34 +24,44 @@ func InsertUser(userinfo UserInfo) error {
 }
 
 func CheckUsername(userinfo UserInfo) (bool, error) {
-	var username string
+	fmt.Println("start CheckUsername")
+	fmt.Println(userinfo)
+	var username []string
 	err := db.Select(&username, "SELECT username FROM users WHERE username=?", userinfo.UserName)
 	result := false
-	if username != "" {
+	if username != nil {
 		result = true
+		println("username in not exit")
 	}
+	fmt.Println("finished")
 	return result, err
 }
 
 func CheckPassword(userinfo UserInfo) (string, error) {
-	var passwd string
+	fmt.Println("start CheckPassword")
+	fmt.Println(userinfo)
+	var passwd []string
 	err := db.Select(&passwd, "SELECT passwd FROM users WHERE username=?", userinfo.UserName)
-	return passwd, err
+	fmt.Println("finished")
+	return passwd[0], err
 }
 
 func CheckActivateStatus(userinfo UserInfo) (int, error) {
-	var activated int
+	fmt.Println("start CheckActivateStatus")
+	var activated []int
 	err := db.Select(&activated, "SELECT activated FROM users WHERE username=?", userinfo.UserName)
-	return activated, err
+	fmt.Println("finished")
+	return activated[0], err
 }
 
 func DeleteUser(userinfo UserInfo) (string, error) {
-	var permission string
+	fmt.Println("start DeleteUser")
+	var permission []string
 	err := db.Select(&permission, "SELECT permission FROM users WHERE username=?", userinfo.UserName)
 	if err != nil {
 		return "", err
 	}
-	if permission == "admin" {
+	if permission[0] == "admin" {
 		return "you can not delete admin!", nil
 	}
 
@@ -57,19 +69,23 @@ func DeleteUser(userinfo UserInfo) (string, error) {
 	if err != nil {
 		return "delete failed:", err
 	}
+	fmt.Println("finished")
 	return "the user:" + userinfo.UserName + " is deleted successfully", nil
 }
 
 func CheckPermission(userinfo UserInfo) (string, error) {
-	var permission string
+	fmt.Println("start CheckPermission")
+	var permission []string
 	err := db.Select(&permission, "SELECT permission FROM users WHERE username=?", userinfo.UserName)
 	if err != nil {
 		return "", err
 	}
-	return permission, nil
+	fmt.Println("finished")
+	return permission[0], nil
 }
 
 func UpdateUserinfo(origUsername string, userinfo UserInfo) (string, error) {
+	fmt.Println("start  UpdateUserinfo")
 	if userinfo.UserName != "" {
 		_, err := db.Exec("UPDATE users SET username=? WHERE username=?", userinfo.UserName, origUsername)
 		if err != nil {
@@ -107,15 +123,17 @@ func UpdateUserinfo(origUsername string, userinfo UserInfo) (string, error) {
 }
 
 func FindUser(userinfo UserInfo) (UserInfo, error) {
-	var info UserInfo
+	fmt.Println("start FindUser")
+	var info []UserInfo
 	err := db.Select(&info, "SELECT uid,username,passwd,permission,email FROM users WHERE username=?", userinfo.UserName)
 	if err != nil {
-		return info, err
+		return info[0], err
 	}
-	return info, nil
+	return info[0], nil
 }
 
 func ListUsers() ([]string, error) {
+	fmt.Println("start ListUsers")
 	var users []string
 	err := db.Select(&users, "SELECT username FROM users")
 	if err != nil {
@@ -125,6 +143,7 @@ func ListUsers() ([]string, error) {
 }
 
 func ActivateUser(userinfo UserInfo) (string, error) {
+	fmt.Println("start ActivateUser")
 	_, err := db.Exec("UPDATE users SET activated=? WHERE username=?", 1, userinfo.UserName)
 	if err != nil {
 		return "", err
