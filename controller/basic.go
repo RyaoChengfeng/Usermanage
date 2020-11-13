@@ -51,6 +51,11 @@ func UserRegister(c echo.Context) error {
 		return ErrorHandler(c, http.StatusBadRequest, err.Error())
 	}
 
+	err = model.AddValidToken(token)
+	if err != nil {
+		return ErrorHandler(c, http.StatusBadRequest, err.Error())
+	}
+
 	return c.JSON(http.StatusOK, echo.Map{
 		"token":   token,
 		"massage": msg,
@@ -96,21 +101,31 @@ func UserLogin(c echo.Context) error {
 
 	userinfo.Permission, err = model.CheckPermission(userinfo)
 
-	t, err := util.CreateAuthToken(userinfo)
+	token, err := util.CreateAuthToken(userinfo)
+	if err != nil {
+		return ErrorHandler(c, http.StatusBadRequest, err.Error())
+	}
+
+	err = model.AddValidToken(token)
 	if err != nil {
 		return ErrorHandler(c, http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{
-		"token":   t,
+		"token":   token,
 		"massage": "log in successfully",
 	})
 }
 
 // /activate
 func UserActivate(c echo.Context) error {
+	URLToken := c.QueryParam("verify")
 	authHeader := c.Request().Header.Get("Authorization")
 	tokenString := util.GetJWTToken(authHeader)
+	if URLToken != tokenString {
+		return ErrorHandler(c, http.StatusUnauthorized, "username is not match")
+	}
+
 	claims, err := util.ParseToken(tokenString)
 	if err != nil {
 		return ErrorHandler(c, http.StatusBadRequest, err.Error())
@@ -127,9 +142,13 @@ func UserActivate(c echo.Context) error {
 	return c.JSON(http.StatusOK, msg)
 }
 
-
-
-////func  注销，把token加入黑名单
-//func Logout(c echo.Context) error {
-//
-//}
+//注销
+func Logout(c echo.Context) error {
+	authHeader := c.Request().Header.Get("Authorization")
+	tokenString := util.GetJWTToken(authHeader)
+	err := model.AddInvalidToken(tokenString)
+	if err != nil {
+		return ErrorHandler(c, http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, "logout successfully")
+}

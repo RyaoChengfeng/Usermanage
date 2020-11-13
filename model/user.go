@@ -127,7 +127,7 @@ func ListUsers() ([]string, error) {
 func ActivateUser(userinfo UserInfo) (string, error) {
 	_, err := db.Exec("UPDATE users SET activated=? WHERE username=?", 1, userinfo.UserName)
 	if err != nil {
-		return "",err
+		return "", err
 	}
 	return "you account is activate successfully", nil
 }

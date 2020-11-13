@@ -1,4 +1,3 @@
-Usermanage
 # 用户管理系统
 
 ## 用户
@@ -17,26 +16,34 @@ Usermanage
 
 ## 内容
 
-支持注册、登录、验证身份、管理用户（CURD）
+- 支持注册、登录、验证身份、管理用户（CURD）
 
-邮件认证激活用户，否则不能登录，认证方式为访问URL
+- 邮件认证激活用户，否则不能登录，认证方式为访问URL
+    - 实现：token中包含username信息， 进入相应链接`http://localhost:1323/activate?verify=<tokenString>` ,匹配链接中tokenstring和访问的客户端发来的token，匹配成功后解析出username，进行激活账号
+    - 激活状态在token中，未激活报错401
 
-验证身份使用JWT
+- 验证身份使用JWT
 
-passwd采用md5加密
+- passwd采用md5加密
 
-数据交互形式采用JSON
+- 数据交互形式采用JSON
 
-发送邮件采用TLS加密
+- 发送邮件采用TLS加密
 
-用户数据存入mysql
+- 用户数据存入mysql,用户信息都在mysql中读写
 
-验证URL、无效token存入redis
-
-用户修改密码，用户改变权限导致登录态失效，实现方法为将现有token变为无效token
+- 用户修改密码，用户改变权限导致登录态失效
+    - 实现：将有效token从redis中删除，用户重新登录后redis重新获得对应的有效token
 
 
 
 ## API文档
 
-现在不会写，咕咕咕
+不会写，咕咕咕
+
+
+
+## 待解决
+
+- 有关数据改动写入log
+- email发送后过一段时间可以重新发送一个，发送后上一个邮件失效

@@ -12,4 +12,5 @@ require (
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
+	golang.org/x/tools v0.0.0-20201112185108-eeaa07dd7696 // indirect
 )
