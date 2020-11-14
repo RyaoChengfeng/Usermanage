@@ -3,7 +3,6 @@ package util
 import (
 	"Usermanage/config"
 	"Usermanage/model"
-	"crypto/tls"
 	"fmt"
 	"github.com/jordan-wright/email"
 	"net/smtp"
@@ -21,13 +20,10 @@ func SendAuthEmail(userinfo model.UserInfo, tokenString string) (string, error) 
 	//e.To = []string{userinfo.Email} //为啥不能直接用string
 	//用tls加密
 	fmt.Println("sending email now ...")
-	err := e.SendWithTLS(
+	err := e.Send(
 		config.EmailAddr,
 		smtp.PlainAuth("", config.EmailUsername, config.EmailPasswd, config.EmailHost),
-		&tls.Config{
-			InsecureSkipVerify: true,
-			ServerName:         config.EmailHost,
-		})
+	)
 	fmt.Println("finished")
 	if err != nil {
 		return "", err

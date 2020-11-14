@@ -20,7 +20,7 @@
 
 
 - 邮件认证激活用户，否则不能登录，认证方式为访问URL
-    - 实现：token中包含username信息， 进入相应链接http://localhost:1323/activate?verify=<tokenString>,匹配链接中tokenstring和访问的客户端发来的token，匹配成功后解析出username，进行激活账号
+    - 实现：token中包含username信息， 进入相应链接`http://localhost:1323/activate?verify=<tokenString>` ,匹配链接中tokenstring和访问的客户端发来的token，匹配成功后解析出username，进行激活账号
     - 激活状态在token中，未激活报错401
 
 - 验证身份使用JWT
@@ -46,12 +46,6 @@
 ## API文档
 
 不会写，咕咕咕
-
-
-
-## 还未解决的问题
-
-- jwt验证和登录态验证的中间件没有写出来
 
 ## 有时间可以尝试做的
 

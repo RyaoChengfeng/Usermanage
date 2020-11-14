@@ -2,7 +2,6 @@ package config
 
 import (
 	"github.com/dgrijalva/jwt-go"
-	"github.com/labstack/echo/middleware"
 	"time"
 )
 
@@ -18,12 +17,12 @@ var (
 	JWTDuration  = time.Hour * 12
 	JWTTemporary = time.Minute * 5
 
-	AdminJWTConfig = middleware.JWTConfig{
-		SigningKey: []byte(JWTSecret),
-		Claims:     JwtCustomClaims{Permission: "admin", Auth: true},
-	}
-	UserJWTConfig = middleware.JWTConfig{
-		SigningKey: []byte(JWTSecret),
-		Claims:     JwtCustomClaims{Permission: "default", Auth: true},
-	}
+	//AdminJWTConfig = middleware.JWTConfig{
+	//	SigningKey: []byte(JWTSecret),
+	//	Claims:     JwtCustomClaims{Permission: "admin", Auth: true},
+	//}
+	//UserJWTConfig = middleware.JWTConfig{
+	//	SigningKey: []byte(JWTSecret),
+	//	Claims:     JwtCustomClaims{Permission: "default", Auth: true},
+	//}
 )

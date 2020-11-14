@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"github.com/garyburd/redigo/redis"
 )
 
 func AddValidToken(tokenString string) error {
@@ -22,10 +23,10 @@ func AddInvalidToken(tokenString string) error {
 	return nil
 }
 
-//func CheckToken(tokenString string) (int, error) {
-//	rst, err := redis.Int(cli.Do("Get", tokenString))
-//	if err != nil {
-//		return 0, err
-//	}
-//	return rst, nil
-//}
+func CheckToken(tokenString string) (int, error) {
+	rst, err := redis.Int(cli.Do("Get", tokenString))
+	if err != nil {
+		return 0, err
+	}
+	return rst, nil
+}

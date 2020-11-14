@@ -3,8 +3,10 @@ package controller
 import (
 	"Usermanage/config"
 	"Usermanage/model"
+	"Usermanage/util"
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 	"github.com/labstack/echo"
 	"net/http"
 )
@@ -70,6 +72,27 @@ func AdminUpdateUserinfo(c echo.Context) error {
 	msg, err := model.UpdateUserinfo(origUsername, userinfo)
 	if err != nil {
 		return ErrorHandler(c, http.StatusBadRequest, msg)
+	}
+
+	if userinfo.Passwd != "" {
+		authHeader := c.Request().Header.Get("Authorization")
+		tokenString := util.GetJWTToken(authHeader)
+		err := model.AddInvalidToken(tokenString)
+		if err != nil {
+			fmt.Println(err)
+			return ErrorHandler(c, http.StatusBadRequest, err.Error())
+		}
+		msg += ".\n the user's password is changed"
+	}
+	if userinfo.Permission != "" {
+		authHeader := c.Request().Header.Get("Authorization")
+		tokenString := util.GetJWTToken(authHeader)
+		err := model.AddInvalidToken(tokenString)
+		if err != nil {
+			fmt.Println(err)
+			return ErrorHandler(c, http.StatusBadRequest, err.Error())
+		}
+		msg += ".\n the user's Permission is changed"
 	}
 
 	return c.JSON(http.StatusOK, msg)

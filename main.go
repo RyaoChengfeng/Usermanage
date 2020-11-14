@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Usermanage/config"
 	"Usermanage/controller"
+	"Usermanage/middlewares"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
@@ -19,12 +19,16 @@ func main() {
 	e.GET("/logout", controller.Logout)
 
 	u := e.Group("/user")
-	u.Use(middleware.JWTWithConfig(config.UserJWTConfig))
+	//u.Use(middleware.JWTWithConfig(config.UserJWTConfig))
+	u.Use(middlewares.CheckValidJWT)
+	u.Use(middlewares.CheckUserJWTConfig)
 
 	u.PUT("/:user", controller.UserUpdateUserinfo)
 
 	a := e.Group("/admin")
-	a.Use(middleware.JWTWithConfig(config.AdminJWTConfig))
+	//a.Use(middleware.JWTWithConfig(config.AdminJWTConfig))
+	a.Use(middlewares.CheckValidJWT)
+	a.Use(middlewares.CheckAdminJWTConfig)
 
 	a.GET("/:user", controller.AdminFindUserinfo)
 	a.DELETE("/:user", controller.AdminDeleteUser)
@@ -33,3 +37,5 @@ func main() {
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
+
+//middleware.JWTWithConfig{config}到底怎么用？
